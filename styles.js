@@ -3,20 +3,30 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    marginTop: 20,
-    backgroundColor: 'white', // Tausta valkoinen
+    paddingTop: 20,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
-    marginTop: 20,
+    marginTop: 60,
   },
-  chart: {
-    marginVertical: 8,
-    borderRadius: 16,
+  labelText: {
+    fontSize: 14,
+    marginBottom: 12,
+  },
+  chartContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 20,
+  },
+  barChart: {
+    height: 330,
+    width: '100%',
+  },
+  leftPanel: {
+    width: 100,
   },
 });
 

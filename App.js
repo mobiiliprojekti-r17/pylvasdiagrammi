@@ -1,65 +1,65 @@
 import React from 'react';
-import { View, Text, Dimensions } from 'react-native';
-import { BarChart } from 'react-native-chart-kit';
-import { cityData } from './data'; // Varmista, että polku on oikea
+import { View, Text } from 'react-native';
+import { BarChart, Grid } from 'react-native-svg-charts';
+import { Text as SVGText } from 'react-native-svg';
+import { cityData } from './data';
 import styles from './styles';
 
-const screenWidth = Dimensions.get('window').width;
-
 const CityPopulationChart = () => {
-  const data = {
-    labels: cityData.map(city => city.name), // Kaupunkien nimet x-akselille
-    datasets: [
-      {
-        data: cityData.map(city => city.population), // Väkiluvut y-akselille
-      }
-    ]
-  };
+  const sortedData = [...cityData].sort((a, b) => b.population - a.population);
 
-  const chartConfig = {
-    backgroundColor: "#ffffff",
-    backgroundGradientFrom: "#ffffff",
-    backgroundGradientTo: "#ffffff",
-    decimalPlaces: 0,
-    color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
-    style: {
-      borderRadius: 16,
-      paddingBottom: 10,
-    },
-    xAxisLabelRotation: 45, // Kierrä x-akselin tekstit 45 astetta
-    labelColor: () => '#000', // Määritetään akselin tekstin väri
-  };
+  const data = sortedData.map(city => city.population);
+  const labels = sortedData.map(city => city.name);
+
+  const Labels = ({ x, y, bandwidth, data }) => (
+    data.map((value, index) => {
+      const labelPositionX = x(value) + 5;
+      const labelPositionY = y(index) + bandwidth / 2;
+
+      return (
+        <SVGText
+          key={`value-${index}`}
+          x={labelPositionX}
+          y={labelPositionY}
+          fontSize={12}
+          fill="black"
+          alignmentBaseline="middle"
+          textAnchor="start"
+        >
+          {value}
+        </SVGText>
+      );
+    })
+  );
 
   return (
-    <View style={[styles.container, { backgroundColor: 'white', flex: 1 }]}>
-      <Text style={[styles.title, { fontSize: 20, fontWeight: 'bold', textAlign: 'center', marginBottom: 10 }]}>
-        Suurimmat kaupungit väkiluvun mukaan
+    <View style={[styles.container, { backgroundColor: 'white' }]}>
+      <Text style={styles.title}>
+        Iranin 10 suurinta kaupunkia väkiluvun mukaan R17
       </Text>
 
-      <BarChart
-        style={[styles.chart, { marginVertical: 10, marginRight: 50 }]} // Pienemmät marginaalit
-        data={data}
-        width={screenWidth - 40} // Varmistetaan, että kaavio ei mene ruudun ulkopuolelle
-        height={300}
-        chartConfig={chartConfig}
-        verticalLabelRotation={30} // Kierrä pystysuoria etikettejä
-        fromZero={true}  // Varmistetaan, että y-akseli alkaa nollasta
-        withVerticalLabels={true} // Näytetään pystysuuntaiset etiketit
-        withHorizontalLabels={true} // Näytetään vaakasuorat etiketit
-        showBarTops={true} // Näytetään pylväiden yläpään arvot
-        showValuesOnTopOfBars={true} // Näytetään pylväiden yläpuolella arvot
-        xAxisLabelStyle={{
-          fontSize: 8, // Fonttikoko pienemmäksi
-          color: '#000',
-          textAlign: 'center', // Keskitetään tekstit
-          marginBottom: 10, // Lisää väliä x-akselin teksteille
-          paddingRight: 15, // Lisää väliä oikealle
-        }}
-        yAxisLabelStyle={{
-          fontSize: 12, // Pienennetään y-akselin arvot
-          color: '#000', // Y-akselin arvot näkyy mustina
-        }}
-      />
+      <View style={styles.chartContainer}>
+        {/* Kaupunkien nimet*/}
+        <View style={[styles.leftPanel, { alignItems: 'flex-start', marginLeft: 0 }]}>
+          {labels.map((label, index) => (
+            <Text key={index} style={[styles.labelText, { textAlign: 'right', paddingLeft: 20 }]}>{label}</Text>
+          ))}
+        </View>
+
+        {/* Vaakasuuntainen pylväsdiagrammi */}
+        <BarChart
+          style={styles.barChart}
+          data={data}
+          horizontal={true}
+          svg={{ fill: 'rgba(134, 65, 244, 0.8)' }}
+          contentInset={{ top: 15, bottom: 20, left: 0, right: 160 }}
+          spacing={0.3}
+          gridMin={0}
+        >
+          <Grid direction={Grid.Direction.VERTICAL} />
+          <Labels />
+        </BarChart>
+      </View>
     </View>
   );
 };
